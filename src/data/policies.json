@@ -1,0 +1,135 @@
+{
+  "policies": [
+    {
+      "id": "youth-housing-001",
+      "title": "청년 월세 특별지원",
+      "summary": "무주택 청년의 주거비 부담을 덜어주기 위한 월세 지원 정책입니다.",
+      "category": "housing",
+      "source": "국토교통부",
+      
+      "tags": ["주거", "청년", "월세", "생활비"],
+      "situations": ["independence"],
+      
+      "target": "만 19~34세 청년",
+      "amount": "월 최대 20만원 지원 (최대 12개월)",
+      "period": "2024년 1월 ~ 12월",
+      "deadline": "2024-12-31",
+      
+      "detailedDescription": "본 정책은 주거비 부담으로 어려움을 겪는 청년들의 안정적인 주거환경 조성을 위해 마련되었습니다. 월세 지원을 통해 청년들이 독립적인 생활을 영위할 수 있도록 하고, 사회진출 초기의 경제적 부담을 덜어주는 것이 목적입니다.",
+      
+      "requirements": "만 19~34세 청년, 무주택자, 소득 기준 충족",
+      "documents": "신분증, 임대차계약서, 소득증명서류, 통장사본",
+      "process": "온라인 신청 → 서류 검토 → 자격 확인 → 지원 여부 결정 통보 → 매월 25일 지정 계좌로 지원금 지급",
+      "cautions": "최초 신청 후 지원 여부 결정 통보",
+      "applicationUrl": "https://www.gov.kr/portal/service/serviceInfo/PTR000050681",
+      
+      "createdAt": "2024-01-01",
+      "updatedAt": "2024-08-01",
+      "views": 15400
+    },
+    {
+      "id": "employment-support-002", 
+      "title": "국민취업지원제도",
+      "summary": "취업을 원하는 모든 국민에게 취업지원서비스와 소득지원을 함께 제공합니다.",
+      "category": "employment-education",
+      "source": "고용노동부",
+      
+      "tags": ["취업", "구직활동", "교육", "실업급여"],
+      "situations": ["job-seeking", "after-resignation"],
+      
+      "target": "구직 희망자",
+      "amount": "월 최대 50만원 (최대 6개월)",
+      "period": "2024년 8월 15일까지",
+      "deadline": "2024-08-15",
+      
+      "detailedDescription": "취업을 원하는 모든 국민에게 취업지원서비스와 소득지원을 함께 제공합니다.",
+      "requirements": "구직 희망자, 소득 요건 등 충족",
+      "documents": "신분증, 구직신청서, 소득 관련 서류",
+      "process": "온라인 신청 → 상담 → 취업지원 프로그램 참여",
+      "cautions": "마감임박! 서둘러 신청하세요",
+      "applicationUrl": "https://www.gov.kr/portal/service/serviceInfo/PTR000001800",
+      
+      "createdAt": "2024-01-15", 
+      "updatedAt": "2024-07-30",
+      "views": 45200
+    },
+    {
+      "id": "childcare-support-003",
+      "title": "육아 돌봄 서비스",
+      "summary": "육아 부담을 덜어주는 돌봄 서비스 지원",
+      "category": "welfare",
+      "source": "보건복지부",
+      
+      "tags": ["육아", "돌봄", "보육", "어린이집"],
+      "situations": ["childcare-prep"],
+      
+      "target": "영유아 자녀가 있는 가정",
+      "amount": "월 최대 30만원 돌봄 서비스 지원",
+      "period": "2024년 1월 ~ 12월",
+      "deadline": "2024-12-31",
+      
+      "detailedDescription": "육아 부담을 덜어주고 맞벌이 부부의 일과 가정 양립을 지원하기 위한 돌봄 서비스입니다.",
+      "requirements": "영유아 자녀가 있는 가정, 소득 기준 충족",
+      "documents": "신분증, 출생증명서, 소득증명서류",
+      "process": "온라인 신청 → 서류 검토 → 자격 확인 → 지원금 지급",
+      "cautions": "돌봄 서비스 이용 시에만 지원",
+      "applicationUrl": "https://www.gov.kr/portal/service/serviceInfo/PTR000050682",
+      
+      "createdAt": "2024-01-01",
+      "updatedAt": "2024-08-01",
+      "views": 8900
+    },
+    {
+      "id": "tax-deduction-004",
+      "title": "연말정산 특별공제",
+      "summary": "청년을 위한 연말정산 세금 공제 혜택",
+      "category": "welfare",
+      "source": "국세청",
+      
+      "tags": ["세금", "공제", "환급", "연말정산"],
+      "situations": ["tax-settlement"],
+      
+      "target": "만 19~34세 청년",
+      "amount": "최대 50만원 세금 공제",
+      "period": "2024년 1월 ~ 12월",
+      "deadline": "2025-03-31",
+      
+      "detailedDescription": "청년들의 세금 부담을 덜어주기 위한 특별 공제 혜택입니다.",
+      "requirements": "만 19~34세 청년, 근로소득자",
+      "documents": "소득금액증명원, 신분증",
+      "process": "연말정산 신고 시 자동 적용",
+      "cautions": "연말정산 신고 기간 내 신고 필수",
+      "applicationUrl": "https://www.gov.kr/portal/service/serviceInfo/PTR000050683",
+      
+      "createdAt": "2024-01-01",
+      "updatedAt": "2024-08-01",
+      "views": 23400
+    },
+    {
+      "id": "marriage-support-005",
+      "title": "신혼부부 주택구입 지원",
+      "summary": "신혼부부의 주택구입을 위한 특별 지원",
+      "category": "housing",
+      "source": "국토교통부",
+      
+      "tags": ["결혼", "신혼", "주택", "구입"],
+      "situations": ["marriage-prep"],
+      
+      "target": "신혼부부",
+      "amount": "최대 1억원 주택구입 자금 지원",
+      "period": "2024년 1월 ~ 12월",
+      "deadline": "2024-12-31",
+      
+      "detailedDescription": "신혼부부의 주택구입을 위한 특별 지원 프로그램입니다.",
+      "requirements": "신혼부부, 무주택자, 소득 기준 충족",
+      "documents": "혼인신고서, 신분증, 소득증명서류",
+      "process": "온라인 신청 → 서류 검토 → 자격 확인 → 지원금 지급",
+      "cautions": "주택구입 계약 후 신청 가능",
+      "applicationUrl": "https://www.gov.kr/portal/service/serviceInfo/PTR000050684",
+      
+      "createdAt": "2024-01-01",
+      "updatedAt": "2024-08-01",
+      "views": 12300
+    }
+  ]
+} 
