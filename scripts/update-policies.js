@@ -86,6 +86,14 @@ async function main() {
     
     // 정책 데이터 가져오기
     const policyRows = await fetchSheetData(sheetId, '정책_마스터!A:Z', apiKey);
+    
+    // 디버깅: 헤더와 첫 몇 행 출력
+    console.log('📋 스프레드시트 헤더:', policyRows[0]);
+    console.log('📋 데이터 행 수:', policyRows.length);
+    if (policyRows.length > 1) {
+      console.log('📋 첫 번째 데이터 행:', policyRows[1]);
+    }
+    
     const policies = convertRowsToObjects(policyRows);
     
     // 상황 데이터 가져오기 (선택사항)
