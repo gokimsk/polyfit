@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Policy, SituationId, CategoryId, SortOption, SITUATIONS, CATEGORIES, SORT_OPTIONS } from '@/types';
@@ -25,7 +25,7 @@ const situationLabels = {
   'marriage-prep': '결혼 준비'
 };
 
-export default function PoliciesPage() {
+function PoliciesContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [policies, setPolicies] = useState<Policy[]>([]);
@@ -235,5 +235,20 @@ export default function PoliciesPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function PoliciesPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">정책을 불러오는 중...</p>
+        </div>
+      </div>
+    }>
+      <PoliciesContent />
+    </Suspense>
   );
 } 
