@@ -16,6 +16,9 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        token: ${{ secrets.GITHUB_TOKEN }}
       
     - name: Setup Node.js
       uses: actions/setup-node@v4
@@ -34,18 +37,9 @@ jobs:
         node scripts/update-policies.js
         
     - name: Commit and push if changes
-      run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        
-        # 최신 변경사항 가져오기
-        git pull origin main
-        
-        git add src/data/
-        
-        if git diff --staged --quiet; then
-          echo "No changes to commit"
-        else
-          git commit -m "📊 정책 데이터 자동 업데이트 $(date '+%Y-%m-%d %H:%M')"
-          git push origin main
-        fi
+      uses: stefanzweifel/git-auto-commit-action@v5
+      with:
+        commit_message: '📊 정책 데이터 자동 업데이트'
+        file_pattern: 'src/data/*'
+        commit_user_name: 'github-actions[bot]'
+        commit_user_email: 'github-actions[bot]@users.noreply.github.com'
