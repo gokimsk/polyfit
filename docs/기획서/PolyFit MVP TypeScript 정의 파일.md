@@ -29,7 +29,7 @@ export interface Situation {
 id: SituationId;
 title: string;
 description: string;
-tags: string[]; // 6개 고정
+tags: string[]; // 8개 권장 (확장 태그 지원)
 color?: string; // UI 색상 (선택사항)
 }
 

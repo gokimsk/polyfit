@@ -42,7 +42,8 @@
 | 언어 | TypeScript | 5.0+ | 타입 안정성 확보 |
 | 스타일링 | Tailwind CSS | 3.0+ | 유틸리티 기반 CSS |
 | 배포 | Vercel | - | GitHub 연동 자동 배포 |
-| 데이터 | JSON 파일 | - | 정적 데이터 (20-30개 정책) |
+| 데이터 | JSON 파일 + Google Sheets | - | Google Sheets 자동화 연동 |
+| 자동화 | GitHub Actions | - | 정책 데이터 자동 업데이트 |
 
 ### 🏗️ 아키텍처 구조
 
@@ -114,35 +115,52 @@ interface AppState {
 
 ```
 
-### 3.2 태그 매칭 알고리즘
+### 3.2 태그 매칭 알고리즘 (업데이트 v2.0)
 
 ```tsx
 function calculateMatchScore(selectedSituations: Situation[], policy: Policy): number {
   let score = 0;
 
-  // 1순위: 태그 매칭 개수 (기본 점수)
+  // 1순위: 태그 매칭 개수 (높은 가중치 - 매칭당 10점)
   const userTags = selectedSituations.flatMap(s => s.tags);
   const matchingTags = policy.tags.filter(tag => userTags.includes(tag));
-  score += matchingTags.length;
+  score += matchingTags.length * 10;
 
-  // 2순위: 상황 매칭 개수
+  // 2순위: 상황 매칭 개수 (중간 가중치 - 매칭당 5점)
   const matchingSituations = policy.situations.filter(s =>
     selectedSituations.map(sit => sit.id).includes(s)
   );
-  score += matchingSituations.length;
+  score += matchingSituations.length * 5;
 
-  // 3순위: 마감 임박 보너스 (+1점, 30일 이내)
+  // 3순위: 마감일 단계별 보너스 (90일 이내)
   const deadline = new Date(policy.deadline);
-  const daysLeft = (deadline - new Date()) / (1000 * 60 * 60 * 24);
-  if (daysLeft <= 30 && daysLeft > 0) score += 1;
+  const daysLeft = Math.ceil((deadline - new Date()) / (1000 * 60 * 60 * 24));
+  
+  let deadlineBonus = 0;
+  if (daysLeft <= 7 && daysLeft > 0) {
+    deadlineBonus = 5; // 긴급 (1주일 이내)
+  } else if (daysLeft <= 30 && daysLeft > 0) {
+    deadlineBonus = 3; // 임박 (1개월 이내)
+  } else if (daysLeft <= 90 && daysLeft > 0) {
+    deadlineBonus = 1; // 여유 (3개월 이내)
+  }
+  score += deadlineBonus;
 
   return score;
 }
 
+// 점수 체계 상세
+- 태그 매칭: 매칭당 10점 (최우선)
+- 상황 매칭: 매칭당 5점 (중간)
+- 마감 긴급: 5점 (7일 이내)
+- 마감 임박: 3점 (30일 이내)
+- 마감 여유: 1점 (90일 이내)
+
 // 정렬 우선순위 (동점 시)
 1. 매칭 점수 (내림차순)
 2. 마감일 (오름차순)
-3. 업데이트일 (내림차순)
+3. 조회수 (내림차순)
+4. 업데이트일 (내림차순)
 
 ```
 
@@ -189,7 +207,7 @@ interface Policy {
 | **summary** | ✅ | 한 문장 요약 | "무주택 청년의 주거비 부담을 덜어주기 위한 월세 지원 정책입니다." | 마침표로 끝남, 50자 내외 |
 | **category** | ✅ | 고정값 | `housing` | `housing`(주거지원) \| `employment-education`(취업/교육) \| `welfare`(생활/복지) \| `finance-startup`(금융/창업) \| `medical`(의료지원) |
 | **source** | ✅ | 정식 기관명 | "국토교통부" | - |
-| **tags** | ✅ | JSON 배열 | `["주거", "청년", "월세", "생활비"]` | 4-6개 태그 권장 |
+| **tags** | ✅ | JSON 배열 | `["주거", "청년", "월세", "생활비"]` | 4-8개 태그 권장 (확장 태그 지원) |
 | **situations** | ✅ | JSON 배열 | `["independence"]` | `independence`(자취시작) \| `job-seeking`(구직중) \| `after-resignation`(퇴사후) \| `childcare-prep`(육아준비) \| `tax-settlement`(연말정산) \| `marriage-prep`(결혼준비) |
 | **target** | ✅ | 구체적 대상 | "만 19~34세 청년" | - |
 | **amount** | ✅ | 금액+기간 | "월 최대 20만원 지원 (최대 12개월)" | - |
@@ -367,18 +385,52 @@ vercel init
 
 ---
 
+## 🔄 5.5 자동화 워크플로우
+
+### Google Sheets 연동 파이프라인
+
+```mermaid
+graph LR
+    A[Google Sheets<br/>정책 데이터] --> B[GitHub Actions<br/>Cron Job]
+    B --> C[데이터 변환<br/>Scripts]
+    C --> D[JSON 파일<br/>업데이트]
+    D --> E[Git Commit<br/>& Push]
+    E --> F[Vercel<br/>자동 배포]
+```
+
+### 자동화 구성 요소
+
+| 구성요소 | 역할 | 실행 주기 |
+|----------|------|-----------|
+| **Google Sheets API** | 정책 데이터 원본 소스 | 실시간 |
+| **GitHub Actions** | 자동화 워크플로우 실행 | 매일 00:00 UTC |
+| **scripts/update-policies.js** | 데이터 변환 및 검증 | 트리거 시 |
+| **stefanzweifel/git-auto-commit-action** | 안전한 Git 커밋/푸시 | 데이터 변경 시 |
+| **Vercel** | 자동 배포 및 CDN 업데이트 | 코드 변경 시 |
+
+### 데이터 처리 프로세스
+
+1. **추출**: Google Sheets API로 데이터 가져오기
+2. **변환**: CSV → JSON 구조 변환
+3. **검증**: 필수 필드 및 데이터 타입 확인
+4. **정규화**: 헤더명 통일, 배열 변환 등
+5. **저장**: `src/data/*.json` 파일 업데이트
+6. **배포**: Git 커밋 → Vercel 자동 배포
+
+---
+
 ## 📊 6. 데이터 명세
 
-### 6.1 상황별 태그 시스템
+### 6.1 상황별 태그 시스템 (확장 버전)
 
-| 상황 ID | 상황명 | 태그 (6개) |
-| --- | --- | --- |
-| independence | 자취 시작 | #주거 #청년 #월세 #생활비 #독립 #보증금 |
-| job-seeking | 구직 중 | #취업 #청년 #구직활동 #교육 #자격증 #인턴 |
-| after-resignation | 퇴사 후 | #실업급여 #이직 #재취업 #교육 #직업훈련 #생활비 |
-| childcare-prep | 육아 준비 | #육아 #돌봄 #출산 #보육 #어린이집 #의료 |
-| tax-settlement | 연말정산 | #세금 #공제 #환급 #소득 #절세 #근로소득 |
-| marriage-prep | 결혼 준비 | #결혼 #신혼 #혼례 #신혼부부 #주택 #대출 |
+| 상황 ID | 상황명 | 태그 (8개) | 비고 |
+| --- | --- | --- | --- |
+| independence | 자취 시작 | #주거 #청년 #월세 #생활비 #독립 #보증금 #자취 #주거비 | 실제 데이터 기반 확장 |
+| job-seeking | 구직 중 | #취업 #청년 #구직활동 #교육 #자격증 #인턴 #구직 #훈련 | 포괄적 매칭 향상 |
+| after-resignation | 퇴사 후 | #실업급여 #이직 #재취업 #교육 #직업훈련 #생활비 #퇴사 #전직 | 이직 관련 확장 |
+| childcare-prep | 육아 준비 | #육아 #돌봄 #출산 #보육 #어린이집 #의료 #임신 #복지 | 의료/복지 추가 |
+| tax-settlement | 연말정산 | #세금 #공제 #환급 #소득 #절세 #근로소득 #연말정산 | 세금 관련 명시 |
+| marriage-prep | 결혼 준비 | #결혼 #신혼 #혼례 #신혼부부 #주택 #대출 #대출금 | 금융 지원 확장 |
 
 ### 6.2 카테고리 시스템
 
