@@ -37,11 +37,15 @@ jobs:
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
+        
+        # 최신 변경사항 가져오기
+        git pull origin main
+        
         git add src/data/
         
         if git diff --staged --quiet; then
           echo "No changes to commit"
         else
           git commit -m "📊 정책 데이터 자동 업데이트 $(date '+%Y-%m-%d %H:%M')"
-          git push
+          git push origin main
         fi
