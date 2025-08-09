@@ -26,21 +26,39 @@ function convertRowsToObjects(rows) {
     headers.forEach((header, index) => {
       let value = row[index] || '';
       
+      // 헤더명 정규화 (대문자 -> 소문자, 특수 케이스 처리)
+      let normalizedHeader = header.toLowerCase();
+      
+      // applicationUrl -> applicationUrl 매핑 유지
+      if (normalizedHeader === 'applicationurl') {
+        normalizedHeader = 'applicationUrl';
+      }
+      if (normalizedHeader === 'createdat') {
+        normalizedHeader = 'createdAt';
+      }
+      if (normalizedHeader === 'updatedat') {
+        normalizedHeader = 'updatedAt';
+      }
+      if (normalizedHeader === 'detaileddescription') {
+        normalizedHeader = 'detailedDescription';
+      }
+      
       // 특별 처리가 필요한 필드들
-      if (header === 'situations' || header === 'tags') {
+      if (normalizedHeader === 'situations' || normalizedHeader === 'tags') {
         // 콤마로 구분된 문자열을 배열로 변환
         value = value.split(',').map(item => item.trim()).filter(item => item);
-      } else if (header === 'views') {
+      } else if (normalizedHeader === 'views') {
         // 숫자 변환
         value = parseInt(value) || 0;
-      } else if (header === 'deadline') {
+      } else if (normalizedHeader === 'deadline') {
         // 날짜 형식 검증 (YYYY-MM-DD)
         if (value && !value.match(/^\d{4}-\d{2}-\d{2}$/)) {
           console.warn(`잘못된 날짜 형식: ${value}`);
         }
       }
       
-      obj[header] = value;
+      // 정규화된 헤더명으로 저장
+      obj[normalizedHeader] = value;
     });
     return obj;
   });
@@ -48,7 +66,8 @@ function convertRowsToObjects(rows) {
 
 // 데이터 검증
 function validatePolicyData(policies) {
-  const requiredFields = ['id', 'title', 'summary', 'category', 'source', 'situations', 'target', 'amount', 'deadline', 'applicationUrl'];
+  // 현재 스프레드시트에 있는 필수 필드들만 체크
+  const requiredFields = ['id', 'title', 'summary', 'category', 'source', 'tags', 'situations', 'target', 'amount', 'deadline', 'applicationUrl'];
   const errors = [];
   
   policies.forEach((policy, index) => {
