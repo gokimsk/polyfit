@@ -22,6 +22,19 @@ export function calculateMatchScore(
     situationTags.forEach(tag => selectedTags.add(tag));
   });
 
+  // 디버깅: 태그 매칭 과정 로그
+  console.log('🔍 매칭 디버깅:', {
+    selectedSituations,
+    selectedTags: Array.from(selectedTags),
+    policyId: policy.id,
+    policyTags: policy.tags,
+    policySituations: policy.situations,
+    tagType: typeof policy.tags,
+    situationType: typeof policy.situations,
+    isTagsArray: Array.isArray(policy.tags),
+    isSituationsArray: Array.isArray(policy.situations)
+  });
+
   // 선택된 태그와 정책 태그 간의 매칭 개수 계산
   const tagMatches = policy.tags.filter(tag => selectedTags.has(tag)).length;
   score += tagMatches * 10; // 태그 매칭은 높은 가중치
@@ -41,6 +54,14 @@ export function calculateMatchScore(
     score += 1; // 마감 임박 보너스
   }
 
+  console.log('🔍 점수 계산:', {
+    policyId: policy.id,
+    tagMatches,
+    situationMatches,
+    deadlineBonus: (daysUntilDeadline <= 30 && daysUntilDeadline > 0) ? 1 : 0,
+    totalScore: score
+  });
+
   return score;
 }
 
@@ -48,13 +69,14 @@ export function calculateMatchScore(
  * 상황 ID에 해당하는 태그들을 반환합니다.
  */
 function getSituationTags(situationId: SituationId): string[] {
+  // 실제 정책 데이터에서 자주 사용되는 태그들로 업데이트
   const situationTags: Record<SituationId, string[]> = {
-    independence: ['자취', '독립', '생활비', '주거비', '가구', '생활용품'],
-    'job-seeking': ['구직', '취업', '이력서', '면접', '교육', '훈련'],
-    'after-resignation': ['퇴사', '전직', '창업', '교육', '자격증', '재취업'],
-    'childcare-prep': ['육아', '임신', '출산', '보육', '교육', '복지'],
-    'tax-settlement': ['연말정산', '세금', '환급', '공제', '신고', '절세'],
-    'marriage-prep': ['결혼', '신혼', '혼례', '신혼부부', '주택', '대출']
+    independence: ['주거', '청년', '월세', '생활비', '독립', '보증금', '자취', '주거비'],
+    'job-seeking': ['취업', '청년', '구직활동', '교육', '자격증', '인턴', '구직', '훈련'],
+    'after-resignation': ['실업급여', '이직', '재취업', '교육', '직업훈련', '생활비', '퇴사', '전직'],
+    'childcare-prep': ['육아', '돌봄', '출산', '보육', '어린이집', '의료', '임신', '복지'],
+    'tax-settlement': ['세금', '공제', '환급', '소득', '절세', '근로소득', '연말정산'],
+    'marriage-prep': ['결혼', '신혼', '혼례', '신혼부부', '주택', '대출', '대출금']
   };
   
   return situationTags[situationId] || [];
