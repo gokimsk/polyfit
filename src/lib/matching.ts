@@ -45,20 +45,29 @@ export function calculateMatchScore(
   ).length;
   score += situationMatches * 5; // 상황 매칭은 중간 가중치
 
-  // 3. 마감 임박 보너스 (30일 이내)
+  // 3. 마감일 단계별 보너스 (90일 이내)
   const today = new Date();
   const deadline = new Date(policy.deadline);
   const daysUntilDeadline = Math.ceil((deadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
   
-  if (daysUntilDeadline <= 30 && daysUntilDeadline > 0) {
-    score += 1; // 마감 임박 보너스
+  let deadlineBonus = 0;
+  if (daysUntilDeadline <= 7 && daysUntilDeadline > 0) {
+    deadlineBonus = 5; // 긴급 (1주일 이내)
+    score += deadlineBonus;
+  } else if (daysUntilDeadline <= 30 && daysUntilDeadline > 0) {
+    deadlineBonus = 3; // 임박 (1개월 이내)
+    score += deadlineBonus;
+  } else if (daysUntilDeadline <= 90 && daysUntilDeadline > 0) {
+    deadlineBonus = 1; // 여유 (3개월 이내)
+    score += deadlineBonus;
   }
 
   console.log('🔍 점수 계산:', {
     policyId: policy.id,
     tagMatches,
     situationMatches,
-    deadlineBonus: (daysUntilDeadline <= 30 && daysUntilDeadline > 0) ? 1 : 0,
+    daysUntilDeadline,
+    deadlineBonus,
     totalScore: score
   });
 

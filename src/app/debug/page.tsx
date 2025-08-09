@@ -60,11 +60,19 @@ export default function DebugPage() {
       );
       const situationScore = situationMatches.length * 5;
 
-      // 마감 임박 보너스
+      // 마감일 단계별 보너스
       const today = new Date();
       const deadline = new Date(policy.deadline);
       const daysUntilDeadline = Math.ceil((deadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-      const deadlineBonus = (daysUntilDeadline <= 30 && daysUntilDeadline > 0) ? 1 : 0;
+      
+      let deadlineBonus = 0;
+      if (daysUntilDeadline <= 7 && daysUntilDeadline > 0) {
+        deadlineBonus = 5; // 긴급 (1주일 이내)
+      } else if (daysUntilDeadline <= 30 && daysUntilDeadline > 0) {
+        deadlineBonus = 3; // 임박 (1개월 이내)
+      } else if (daysUntilDeadline <= 90 && daysUntilDeadline > 0) {
+        deadlineBonus = 1; // 여유 (3개월 이내)
+      }
 
       return {
         policy,
@@ -101,6 +109,29 @@ export default function DebugPage() {
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-6xl mx-auto">
         <h1 className="text-3xl font-bold text-gray-900 mb-8">🔍 매칭 알고리즘 디버깅</h1>
+        
+        {/* 점수 체계 설명 */}
+        <div className="bg-blue-50 rounded-lg p-6 mb-8 border border-blue-200">
+          <h2 className="text-lg font-semibold text-blue-900 mb-3">📊 점수 체계</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+            <div>
+              <strong className="text-green-700">태그 매칭:</strong> 매칭당 10점
+              <div className="text-gray-600 mt-1">선택한 상황의 태그와 정책 태그 일치</div>
+            </div>
+            <div>
+              <strong className="text-blue-700">상황 매칭:</strong> 매칭당 5점
+              <div className="text-gray-600 mt-1">직접적인 상황 ID 일치</div>
+            </div>
+            <div>
+              <strong className="text-orange-700">마감 보너스:</strong>
+              <div className="text-gray-600 mt-1">
+                • 1주일 이내: 5점 (긴급)<br/>
+                • 1개월 이내: 3점 (임박)<br/>
+                • 3개월 이내: 1점 (여유)
+              </div>
+            </div>
+          </div>
+        </div>
         
         {/* 상황 선택기 */}
         <div className="bg-white rounded-lg p-6 mb-8 shadow">
@@ -175,6 +206,9 @@ export default function DebugPage() {
                   <div className="text-orange-600">{breakdown.deadlineBonus}점</div>
                   <div className="text-xs text-orange-600 mt-1">
                     {breakdown.daysUntilDeadline}일 남음
+                    {breakdown.deadlineBonus === 5 && ' (긴급)'}
+                    {breakdown.deadlineBonus === 3 && ' (임박)'}
+                    {breakdown.deadlineBonus === 1 && ' (여유)'}
                   </div>
                 </div>
               </div>
