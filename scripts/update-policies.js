@@ -85,7 +85,7 @@ async function main() {
     console.log('📊 Google Sheets에서 정책 데이터를 가져오는 중...');
     
     // 정책 데이터 가져오기
-    const policyRows = await fetchSheetData(sheetId, '정책목록!A:Z', apiKey);
+    const policyRows = await fetchSheetData(sheetId, '정책_마스터!A:Z', apiKey);
     const policies = convertRowsToObjects(policyRows);
     
     // 상황 데이터 가져오기 (선택사항)
