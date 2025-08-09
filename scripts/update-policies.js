@@ -45,8 +45,19 @@ function convertRowsToObjects(rows) {
       
       // 특별 처리가 필요한 필드들
       if (normalizedHeader === 'situations' || normalizedHeader === 'tags') {
-        // 콤마로 구분된 문자열을 배열로 변환
-        value = value.split(',').map(item => item.trim()).filter(item => item);
+        // JSON 문자열인 경우 파싱
+        if (typeof value === 'string' && value.startsWith('[') && value.endsWith(']')) {
+          try {
+            value = JSON.parse(value);
+          } catch (e) {
+            console.warn(`JSON 파싱 실패 (${normalizedHeader}): ${value}`);
+            // 콤마로 구분된 문자열로 폴백
+            value = value.split(',').map(item => item.trim()).filter(item => item);
+          }
+        } else {
+          // 콤마로 구분된 문자열을 배열로 변환
+          value = value.split(',').map(item => item.trim()).filter(item => item);
+        }
       } else if (normalizedHeader === 'views') {
         // 숫자 변환
         value = parseInt(value) || 0;
@@ -119,6 +130,10 @@ async function main() {
     if (policies.length > 0) {
       console.log('📋 변환된 첫 번째 정책의 키들:', Object.keys(policies[0]));
       console.log('📋 applicationUrl 값:', policies[0].applicationUrl);
+      console.log('📋 tags 값:', policies[0].tags);
+      console.log('📋 situations 값:', policies[0].situations);
+      console.log('📋 tags 타입:', typeof policies[0].tags, Array.isArray(policies[0].tags));
+      console.log('📋 situations 타입:', typeof policies[0].situations, Array.isArray(policies[0].situations));
     }
     
     // 상황 데이터 가져오기 (선택사항)
