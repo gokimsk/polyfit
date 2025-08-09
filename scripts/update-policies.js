@@ -29,8 +29,8 @@ function convertRowsToObjects(rows) {
       // 헤더명 정규화 (대문자 -> 소문자, 특수 케이스 처리)
       let normalizedHeader = header.toLowerCase();
       
-      // applicationUrl -> applicationUrl 매핑 유지
-      if (normalizedHeader === 'applicationurl') {
+      // applicationUrl 매핑 (오타 케이스 포함)
+      if (normalizedHeader === 'applicationurl' || normalizedHeader === 'appicationurl') {
         normalizedHeader = 'applicationUrl';
       }
       if (normalizedHeader === 'createdat') {
@@ -114,6 +114,12 @@ async function main() {
     }
     
     const policies = convertRowsToObjects(policyRows);
+    
+    // 첫 번째 정책의 키들 출력 (매핑 확인용)
+    if (policies.length > 0) {
+      console.log('📋 변환된 첫 번째 정책의 키들:', Object.keys(policies[0]));
+      console.log('📋 applicationUrl 값:', policies[0].applicationUrl);
+    }
     
     // 상황 데이터 가져오기 (선택사항)
     let situations = [];
