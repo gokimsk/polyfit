@@ -37,9 +37,47 @@ jobs:
         node scripts/update-policies.js
         
     - name: Commit and push if changes
-      uses: stefanzweifel/git-auto-commit-action@v5
-      with:
-        commit_message: '📊 정책 데이터 자동 업데이트'
-        file_pattern: 'src/data/*'
-        commit_user_name: 'github-actions[bot]'
-        commit_user_email: 'github-actions[bot]@users.noreply.github.com'
+      run: |
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        
+        # 변경사항이 있는지 확인
+        git add src/data/
+        
+        if git diff --staged --quiet; then
+          echo "변경사항이 없습니다."
+          exit 0
+        fi
+        
+        # 커밋 생성
+        git commit -m "📊 정책 데이터 자동 업데이트 $(date '+%Y-%m-%d %H:%M')"
+        
+        # 안전한 push를 위한 강력한 재시도 로직
+        MAX_RETRIES=5
+        for i in $(seq 1 $MAX_RETRIES); do
+          echo "Push 시도 $i/$MAX_RETRIES"
+          
+          # 최신 상태로 리베이스
+          if git fetch origin main && git rebase origin/main; then
+            # 리베이스 성공시 푸시 시도
+            if git push origin main; then
+              echo "✅ Push 성공!"
+              exit 0
+            fi
+          else
+            echo "⚠️ 리베이스 실패, force push 시도"
+            # 리베이스 실패시 force push (데이터 파일만 변경하므로 안전)
+            if git push --force-with-lease origin main; then
+              echo "✅ Force push 성공!"
+              exit 0
+            fi
+          fi
+          
+          if [ $i -eq $MAX_RETRIES ]; then
+            echo "❌ $MAX_RETRIES 시도 후 실패"
+            exit 1
+          fi
+          
+          echo "⏳ 10초 대기 후 재시도..."
+          sleep 10
+        done
