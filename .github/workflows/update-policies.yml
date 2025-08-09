@@ -1,0 +1,45 @@
+name: Update Policies from Google Sheets
+
+on:
+  schedule:
+    # 매일 오전 9시에 자동 실행 (KST 기준)
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+    # 수동 실행 가능
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        
+    - name: Install dependencies
+      run: |
+        npm install axios csv-parser
+        
+    - name: Download and convert Google Sheets data
+      env:
+        SHEETS_API_KEY: ${{ secrets.GOOGLE_SHEETS_API_KEY }}
+        SHEETS_ID: ${{ secrets.GOOGLE_SHEETS_ID }}
+      run: |
+        node scripts/update-policies.js
+        
+    - name: Commit and push if changes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add src/data/
+        
+        if git diff --staged --quiet; then
+          echo "No changes to commit"
+        else
+          git commit -m "📊 정책 데이터 자동 업데이트 $(date '+%Y-%m-%d %H:%M')"
+          git push
+        fi

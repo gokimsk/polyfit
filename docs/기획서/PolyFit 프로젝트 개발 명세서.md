@@ -178,6 +178,48 @@ interface Policy {
 
 ```
 
+### 3.4 정책 데이터 엑셀 작성 가이드
+
+#### 📝 컬럼별 작성 양식 및 기준
+
+| 컬럼 | 필수 | 양식 | 예시 | 주의사항 |
+|------|------|------|------|----------|
+| **id** | ✅ | `카테고리-숫자3자리` | `youth-housing-001` | 소문자, 하이픈 구분 |
+| **title** | ✅ | 공식 정책명 | "청년 월세 특별지원" | - |
+| **summary** | ✅ | 한 문장 요약 | "무주택 청년의 주거비 부담을 덜어주기 위한 월세 지원 정책입니다." | 마침표로 끝남, 50자 내외 |
+| **category** | ✅ | 고정값 | `housing` | `housing`(주거지원) \| `employment-education`(취업/교육) \| `welfare`(생활/복지) \| `finance-startup`(금융/창업) \| `medical`(의료지원) |
+| **source** | ✅ | 정식 기관명 | "국토교통부" | - |
+| **tags** | ✅ | JSON 배열 | `["주거", "청년", "월세", "생활비"]` | 4-6개 태그 권장 |
+| **situations** | ✅ | JSON 배열 | `["independence"]` | `independence`(자취시작) \| `job-seeking`(구직중) \| `after-resignation`(퇴사후) \| `childcare-prep`(육아준비) \| `tax-settlement`(연말정산) \| `marriage-prep`(결혼준비) |
+| **target** | ✅ | 구체적 대상 | "만 19~34세 청년" | - |
+| **amount** | ✅ | 금액+기간 | "월 최대 20만원 지원 (최대 12개월)" | - |
+| **period** | ✅ | 신청기간 | "2024년 1월 ~ 12월" | - |
+| **deadline** | ✅ | ISO 날짜 | `2024-12-31` | **반드시 YYYY-MM-DD 형식** |
+| **detailedDescription** | ✅ | 상세설명 | "본 정책은 주거비 부담으로 어려움을 겪는..." | 2-3문장 |
+| **requirements** | ✅ | 자격조건 | "만 19~34세 청년, 무주택자, 소득 기준 충족" | 쉼표 구분 |
+| **documents** | ✅ | 서류목록 | "신분증, 임대차계약서, 소득증명서류" | 쉼표 구분 |
+| **process** | ✅ | 신청절차 | "온라인 신청 → 서류 검토 → 자격 확인" | 화살표(→) 구분 |
+| **cautions** | ✅ | 주의사항 | "최초 신청 후 지원 여부 결정 통보" | 1-2문장 |
+| **applicationUrl** | ✅ | 완전한 URL | `https://www.gov.kr/portal/service/...` | **https:// 필수** |
+| **createdAt** | ✅ | ISO 날짜 | `2024-01-01` | **반드시 YYYY-MM-DD 형식** |
+| **updatedAt** | ⭕ | ISO 날짜 | `2024-08-01` | YYYY-MM-DD 형식 |
+| **views** | ⭕ | 숫자 | `15400` | 선택사항 |
+
+#### ⚠️ 필수 준수사항
+
+1. **날짜 필드**: `deadline`, `createdAt`, `updatedAt`는 반드시 `YYYY-MM-DD` 형식
+2. **JSON 배열**: `tags`, `situations`는 JSON 배열 형태로 작성
+3. **고정값**: `category`, `situations`는 정해진 값만 사용 가능
+4. **URL**: `applicationUrl`은 `https://`로 시작하는 완전한 URL
+
+#### 📋 작성 순서 권장사항
+
+1. **1단계**: 기본정보 (id, title, summary, category, source)
+2. **2단계**: 매칭정보 (tags, situations)  
+3. **3단계**: 카드정보 (target, amount, period, deadline)
+4. **4단계**: 상세정보 (detailedDescription, requirements, documents, process, cautions, applicationUrl)
+5. **5단계**: 메타정보 (createdAt, updatedAt, views)
+
 ---
 
 ## 🎨 4. UI/UX 설계
